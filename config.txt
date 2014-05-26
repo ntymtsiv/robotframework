@@ -1,0 +1,21 @@
+** Variables ***
+
+
+${CONTROLLER_VERIFY_WORK}   /
+
+
+${FUEL_MASTER_ADDR}         10.20.0.2
+${FUEL_MASTER_URL}     \http://${FUEL_MASTER_ADDR}/
+
+${JSON_TEMPLATE}     {'raid_model': 'some_model','raids': [{'mount_point': '/','raid_lvl': 10, 'ctrl_id': 1, 'virtual_device': 2,'phys_devices': [ 3, 4 ],'eid': 5,'options': 'args'}]} 
+
+#URLS
+${JSON_ENUMERATE_PD_TEMPLATE}	{"controller_id":\\d+,"slot":\\d+,"enclosure":\\d+,"size":\\d+,"sector_size":\\d+,"model":.+,"allocated":(true|false),"drive_group":\\d+,"status":"(online|offline|unconfigured_good|unconfigured_bad|dedicated_hot_spare|global_hot_spare|)"}
+${JSON_EENUMERATE_CONTROLLERS_TEMPLATE} 	{"controller_id":\\d+,"model":".+","pci_address":".+","serial_number":".+"}
+
+${JSON_ENUMERATE_PD_EXAMPLE} 	{"controller_id":0,"slot":0,"enclosure":252,"size":999653638144,"sector_size":512,"model":"ST1000NM0011","allocated":true,"drive_group":0,"status":"online"}
+${JSON_EENUMERATE_CONTROLLERS_EXAMPLE} 	{"controller_id":0,"model":"LSI MegaRAID SAS 9260-4i","pci_address":"00:06:00:00","serial_number":"SV24603934"}
+
+
+${ENUMERATE_CONTROLLERS}	/v0.5/controllers
+#${ENUMERATE_PD}		/v0.5/controllers/${CONTROLLER_ID}/physicaldevices
