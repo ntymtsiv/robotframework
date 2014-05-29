@@ -28,11 +28,18 @@ Verify controller work
    Should Contain  ${resp.content}  ${data}
 
 Create RAID level : drive's number  [Arguments]  ${rd_lvl}  ${drives_number}
-   ${json}  Insert In Json  rd_lvl=${rd_lvl}  virtual_device=${drives_number} 
-   Create RAID with  ${json}
-   Should Be Equal As Strings  ${rd_lvl}   ${rd_lvl} 
-   Verify Raid via api  rd_lvl=${rd_lvl}  virtual_device=${drives_number}  
-   Verify Raid via db  rd_lvl=${rd_lvl}  virtual_device=${drives_number} 
+    ${CONTROLLER_ID}=  Get controller id
+    ${json}  Insert In Json  controller_id=${controller_id}  virtual_device=${drives_number}
+    ${resp}  Send http POST request [Arguments]  ${url}  ${body}
+    Should Be Equal As Strings  ${resp.status_code}   200
+    ${jsondata}=  To JSON  ${resp.content}
+    Should Be Equal As Strings  ${rd_lvl}   ${rd_lvl} 
+    Verify Raid via api  rd_lvl=${rd_lvl}  virtual_device=${drives_number}  virtual_drive = ${virtual_drive}
+    ${json} = Create Json For Delete Raid
+    Delete Raid  ${virtual_drive}
+
+Delete Raid [Arguments]  ${json}
+
 
 Create RAID level : drive's number : hotspare  [Arguments]  ${rd_lvl}  ${drives_number}  ${hot_spare_number}
    Should Be Equal As Strings  ${rd_lvl}   ${rd_lvl} 
@@ -64,7 +71,7 @@ Setup ssh connection
   Open Connection  ${FUEL_MASTER_ADDR}  alias=fuel_master
 
 Setup http connection 
-  Create Session  fuel_api  http://google.com
+  Create Session  api  http://${API_ADDRESS}
 
 Get controller id
     ${resp}=  Send http GET request with URL  ${ENUMERATE_CONTROLLERS}
@@ -76,4 +83,16 @@ Get controller id
 Set ENUMERATE_PD   [Arguments]  ${CONTROLLER_ID}
    ${ENUMERATE_PD}=   /v0.5/controllers/${CONTROLLER_ID}/physicaldevices
 
+Send http POST request [Arguments]  ${url}  ${body}
+    ${resp}  Post  api  ${url}  ${body}
+    Should Match Regexp  ${resp.status_code}  2[0-9]{2}
+    Should Match Regexp  ${resp}  SUCCESS
+
+Send http GET request with URL  [Arguments]  ${url}
+  ${response}  Get  api  ${url}
+  Should Match Regexp  200  [0-9]{3}   
+
 Create default raid
+    ${controller_id}=  Get controller id
+    ${json}  Insert In Json  controller_id=${controller_id}  virtual_device=${drives_number}
+    ${resp}  Send http POST request [Arguments]  ${url}  ${body}
