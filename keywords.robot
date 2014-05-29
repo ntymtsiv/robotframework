@@ -77,20 +77,20 @@ Get controller id
     ${resp}=  Send http GET request with URL  ${ENUMERATE_CONTROLLERS}
     Should Be Equal As Strings  ${resp.status_code}   200
     ${jsondata}=  To JSON  ${resp.content}
-    [return]    ${jsondata['controller_id']}
+    [return]    ${jsondata['data'][0]['controller_id']}
 
 
 Set ENUMERATE_PD   [Arguments]  ${CONTROLLER_ID}
    ${ENUMERATE_PD}=   /v0.5/controllers/${CONTROLLER_ID}/physicaldevices
 
-Send http POST request [Arguments]  ${url}  ${body}
+Send http POST request  [Arguments]  ${url}  ${body}
     ${resp}  Post  api  ${url}  ${body}
-    Should Match Regexp  ${resp.status_code}  2[0-9]{2}
-    Should Match Regexp  ${resp}  SUCCESS
+    Should Be Equal As Strings   ${resp.content}  200
+    [return]  ${resp}
 
 Send http GET request with URL  [Arguments]  ${url}
-  ${response}  Get  api  ${url}
-  Should Match Regexp  200  [0-9]{3}   
+	${resp}  Get  api  ${url}
+	[return]  ${resp}
 
 Create default raid
     ${controller_id}=  Get controller id

@@ -15,7 +15,7 @@ class CommonKeywords(object):
     def _parse_args_in_json(self, args):
         json = {}
         for arg in args:
-           key, value = i.split('=')
+           key, value = arg.split('=')
            json[key] = value
         return json
 
@@ -40,7 +40,7 @@ class CommonKeywords(object):
     def insert_in_json(self, *args):
         json = BuiltIn().replace_variables('${JSON_TEMPLATE}')
         json = ast.literal_eval(json)
-        json['raids'][0] = _parse_args_in_json(args)
+        json['raids'][0] = self._parse_args_in_json(args)
         return json
 
     def print_this(self, *args):
