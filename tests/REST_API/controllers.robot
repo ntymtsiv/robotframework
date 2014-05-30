@@ -36,8 +36,8 @@ Resource  config.txt
 
 TC-4 Create a virtual drives (raid arrays)
 	${CONTROLLER_ID}=  Get controller id
-        ${json}  Insert In Json  controller_id=${CONTROLLER_ID}  virtual_device=2
-        ${resp}  Send http POST request  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices  ${json}
+	Create json for RAID creating  ${CONTROLLER_ID}  device_number=2
+    ${resp}  Send http POST request  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices  ${json}
 	Should Be Equal As Strings  ${resp.status_code}   200
 	${jsondata}=  To JSON  ${resp.content}
 #	Should Match Regexp  ${jsondata}  ${JSON_ENUMERATE_PD_TEMPLATE} 
