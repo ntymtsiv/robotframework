@@ -85,7 +85,8 @@ Set ENUMERATE_PD   [Arguments]  ${CONTROLLER_ID}
 
 Send http POST request  [Arguments]  ${url}  ${body}
     ${resp}  Post  api  ${url}  ${body}
-    Should Be Equal As Strings   ${resp.content}  200
+#    Should Be Equal As Strings  ${body}   200
+
     [return]  ${resp}
 
 Send http GET request with URL  [Arguments]  ${url}
@@ -97,8 +98,8 @@ Create default raid
     ${json}  Insert In Json  controller_id=${controller_id}  virtual_device=${drives_number}
     ${resp}  Send http POST request [Arguments]  ${url}  ${body}
 
-Create json for RAID creating [Arguments]  ${CONTROLLER_ID}  @{args}
+Create json for create RAID  [Arguments]  ${CONTROLLER_ID}  @{args}
   ${resp}=  Send http GET request with URL     /v0.5/controllers/${CONTROLLER_ID}/physicaldevices
   ${jsondata}=  To JSON  ${resp.content}
-  ${json}=  Create Json For Raid Creating  ${CONTROLLER_ID}  ${jsondata['data'][0]}
-  [return]  json
+  ${json}=  Create Json For Raid Creating  ${CONTROLLER_ID}  ${jsondata}  @{args}
+  [return]  ${json}
