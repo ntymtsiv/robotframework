@@ -21,24 +21,18 @@ Create RAID with  [Arguments]  ${json}
    Should Be Equal As Strings  ${resp.status_code}  200
    Should Contain  ${resp.content}  success
 
-Verify controller work
-   Create Session  google  ${HOST}
-   ${resp}=  Get  google  ${CONTROLLER_VERIFY_WORK}
-   Should Be Equal As Strings  ${resp.status_code}  200
-   Should Contain  ${resp.content}  ${data}
 
-Create RAID level : drive's number  [Arguments]  ${rd_lvl}  ${drives_number}
+Create RAID level : drive's number  [Arguments]  ${raide_level}  ${drives_number}
     ${CONTROLLER_ID}=  Get controller id
-    ${json}  Insert In Json  controller_id=${controller_id}  virtual_device=${drives_number}
-    ${resp}  Send http POST request [Arguments]  ${url}  ${body}
-    Should Be Equal As Strings  ${resp.status_code}   200
+    ${json}=  Create json for create RAID  ${CONTROLLER_ID}  drives_number=${drives_number} raid_level=${raide_level}
+    ${resp}=  Send http POST request  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices  ${json}
+    Should Be Equal As Strings  ${resp.status_code}   201
     ${jsondata}=  To JSON  ${resp.content}
-    Should Be Equal As Strings  ${rd_lvl}   ${rd_lvl} 
-    Verify Raid via api  rd_lvl=${rd_lvl}  virtual_device=${drives_number}  virtual_drive = ${virtual_drive}
-    ${json} = Create Json For Delete Raid
-    Delete Raid  ${virtual_drive}
+    Should Be Equal As Strings  ${jsondata["data"]["raide_level"]}  ${raide_level}
+    Should Be Equal As Strings  ${jsondata["data"]["controller_id"]}  ${CONTROLLER_ID}
+    Check existing of RAID  ${CONTROLLER_ID}  ${jsondata["data"]["virtual_drive"]  raid_level=${raide_level}
+    Delete VD  ${CONTROLLER_ID}   ${jsondata["data"]["virtual_drive"]} 
 
-Delete Raid [Arguments]  ${json}
 
 
 Create RAID level : drive's number : hotspare  [Arguments]  ${rd_lvl}  ${drives_number}  ${hot_spare_number}
@@ -85,13 +79,14 @@ Set ENUMERATE_PD   [Arguments]  ${CONTROLLER_ID}
 
 Send http POST request  [Arguments]  ${url}  ${body}
     ${resp}  Post  api  ${url}  ${body}
-#    Should Be Equal As Strings  ${body}   200
-
     [return]  ${resp}
 
 Send http GET request with URL  [Arguments]  ${url}
 	${resp}  Get  api  ${url}
 	[return]  ${resp}
+
+Send http DELETE request with URL  [Arguments]  ${url}
+  ${resp}  Delete  api  ${url}
 
 Create default raid
     ${controller_id}=  Get controller id
@@ -103,3 +98,12 @@ Create json for create RAID  [Arguments]  ${CONTROLLER_ID}  @{args}
   ${jsondata}=  To JSON  ${resp.content}
   ${json}=  Create Json For Raid Creating  ${CONTROLLER_ID}  ${jsondata}  @{args}
   [return]  ${json}
+
+Check existing of RAID  [Argumnets]  ${CONTROLLER_ID}  ${vd_id}  @{args}
+  ${resp}=  Send http GET request with URL  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices
+  ${jsondata}=  To JSON ${resp.content}
+  VD Should Be In VD List  ${jsondata}  ${vd_id}  @{args}
+
+TC-5 Delete VD [Arguments]  ${CONTROLLER_ID}  ${vd_id}
+    ${resp}=  Send http DELETE request with URL  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices/${vd_id}
+    Should Be Equal As Strings  ${resp.status_code}   204

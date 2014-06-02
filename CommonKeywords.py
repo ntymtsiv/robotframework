@@ -12,7 +12,7 @@ class CommonKeywords(object):
      #   self._sut_path = os.path.join(os.path.dirname(__file__),
 #                                      '..', 'sut', 'login.py')
     VALID_PARAMAS_FOR_CREATE_VD = ['raid_level']
-
+    VALID_PARAMAS_FOR_CHECK_VD = ['raid_level']
     def _parse_args_in_json(self, args):
         json = {}
         for arg in args:
@@ -75,9 +75,32 @@ class CommonKeywords(object):
 
 
 
-    def vd_should_be_in_vd_list(self, controller_id, vd_list,  vd_id, **args):
-#	for vd in 
-	pass
+    def vd_should_be_in_vd_list(self, vd_list, vd_id, *args):
+        vd_list = {"data": [{"consistent": False, "controller_id": 0, "read_ahead": True, "write_cache": "wt", "name": "", "raid_level": "1", "drive_group": 2, "access": "rw", "virtual_drive": 4, "state": "optimal", "io_policy": "direct", "size": 999653638144, "physical_drives": [{"slot": 10, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 2, "controller_id": 0, "enclosure": 6}, {"slot": 11, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 2, "controller_id": 0, "enclosure": 6}]}, { "controller_id": 0, "read_ahead": True, "write_cache": "wt", "name": "", "raid_level": "1", "drive_group": 3, "access": "rw", "virtual_drive": 5, "state": "optimal", "io_policy": "direct", "size": 999653638144, "physical_drives": [{"slot": 12, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 3, "controller_id": 0, "enclosure": 6}, {"slot": 17, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 3, "controller_id": 0, "enclosure": 6}]}, {"consistent": False, "controller_id": 0, "read_ahead": True, "write_cache": "wt", "name": "", "raid_level": "1", "drive_group": 4, "access": "rw", "virtual_drive": 2, "state": "optimal", "io_policy": "direct", "size": 999653638144, "physical_drives": [{"slot": 6, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 4, "controller_id": 0, "enclosure": 6}, {"slot": 7, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 4, "controller_id": 0, "enclosure": 6}]}, {"consistent": False, "controller_id": 0, "read_ahead": True, "write_cache": "wt", "name": "", "raid_level": "1", "drive_group": 5, "access": "rw", "virtual_drive": 3, "state": "optimal", "io_policy": "direct", "size": 999653638144, "physical_drives": [{"slot": 8, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 5, "controller_id": 0, "enclosure": 6}, {"slot": 9, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 5, "controller_id": 0, "enclosure": 6}]}, {"consistent": False, "controller_id": 0, "read_ahead": True, "write_cache": "wt", "name": "", "raid_level": "1", "drive_group": 6, "access": "rw", "virtual_drive": 0, "state": "optimal", "io_policy": "direct", "size": 999653638144, "physical_drives": [{"slot": 4, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 6, "controller_id": 0, "enclosure": 6}, {"slot": 5, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 6, "controller_id": 0, "enclosure": 6}]}, {"consistent": True, "controller_id": 0, "read_ahead": True, "write_cache": "wt", "name": "", "raid_level": "1", "drive_group": 0, "access": "rw", "virtual_drive": 6, "state": "optimal", "io_policy": "direct", "size": 999653638144, "physical_drives": [{"slot": 19, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 0, "controller_id": 0, "enclosure": 6}, {"slot": 20, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 0, "controller_id": 0, "enclosure": 6}]}, {"consistent": True, "controller_id": 0, "read_ahead": True, "write_cache": "wt", "name": "", "raid_level": "1", "drive_group": 1, "access": "rw", "virtual_drive": 7, "state": "optimal", "io_policy": "direct", "size": 999653638144, "physical_drives": [{"slot": 2, "sector_size": 512, "state": "online", "model": "ST91000640NS", "size": 999653638144, "allocated": True, "drive_group": 1, "controller_id": 0, "enclosure": 6}, {"slot": 3, "sector_size": 512, "state": "online", "model": "91000640NS", "size": 999653638144, "allocated": True, "drive_group": 1, "controller_id": 0, "enclosure": 6}]}], "error_message": '', "error_code": 0}
+        if args:
+            args = self._args_validation(args, self.VALID_PARAMAS_FOR_CHECK_VD)
+    	for vd in vd_list["data"]:
+            if vd["virtual_drive"] == int(vd_id):
+                if args:
+                    for key in args:
+                        if vd[key] != args[key]:
+                            raise AssertionError("Failed compare key {0}, expected={1}, actual={2}".format(key, args[key], vd[key]))
+                return True
+        raise AssertionError("vd with {0} id was not found".format(vd_id))
+
+
+
+    def _args_validation(self, args, valid_args):
+        _valid_args={}
+        for arg in args:
+            key, value = arg.split('=')
+            if key in valid_args:
+                _valid_args[key] = value
+            if _valid_args:
+                return _valid_args
+            else:
+                return False
+
     def insert_in_json(self, *args):
         json = BuiltIn().replace_variables('${JSON_TEMPLATE}')
         json = ast.literal_eval(json)
