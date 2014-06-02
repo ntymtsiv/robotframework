@@ -22,15 +22,15 @@ Create RAID with  [Arguments]  ${json}
    Should Contain  ${resp.content}  success
 
 
-Create RAID level : drive's number  [Arguments]  ${raide_level}  ${drives_number}
+Create RAID level : drive's number  [Arguments]  ${raid_level}  ${drives_number}
     ${CONTROLLER_ID}=  Get controller id
-    ${json}=  Create json for create RAID  ${CONTROLLER_ID}  drives_number=${drives_number} raid_level=${raide_level}
+    ${json}=  Create json for create RAID  ${CONTROLLER_ID}  drives_number=${drives_number} raid_level=${raid_level}
     ${resp}=  Send http POST request  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices  ${json}
     Should Be Equal As Strings  ${resp.status_code}   201
     ${jsondata}=  To JSON  ${resp.content}
-    Should Be Equal As Strings  ${jsondata["data"]["raide_level"]}  ${raide_level}
+    Should Be Equal As Strings  ${jsondata["data"]["raid_level"]}  ${raid_level}
     Should Be Equal As Strings  ${jsondata["data"]["controller_id"]}  ${CONTROLLER_ID}
-    Check existing of RAID  ${CONTROLLER_ID}  ${jsondata["data"]["virtual_drive"]  raid_level=${raide_level}
+    Check existing of RAID  ${CONTROLLER_ID}  ${jsondata["data"]["virtual_drive"]}  raid_level=${raid_level}
     Delete VD  ${CONTROLLER_ID}   ${jsondata["data"]["virtual_drive"]} 
 
 
@@ -87,6 +87,7 @@ Send http GET request with URL  [Arguments]  ${url}
 
 Send http DELETE request with URL  [Arguments]  ${url}
   ${resp}  Delete  api  ${url}
+  [return]  ${resp}
 
 Create default raid
     ${controller_id}=  Get controller id
@@ -99,11 +100,11 @@ Create json for create RAID  [Arguments]  ${CONTROLLER_ID}  @{args}
   ${json}=  Create Json For Raid Creating  ${CONTROLLER_ID}  ${jsondata}  @{args}
   [return]  ${json}
 
-Check existing of RAID  [Argumnets]  ${CONTROLLER_ID}  ${vd_id}  @{args}
+Check existing of RAID  [Arguments]  ${CONTROLLER_ID}  ${vd_id}  @{args}
   ${resp}=  Send http GET request with URL  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices
-  ${jsondata}=  To JSON ${resp.content}
+  ${jsondata}=  To JSON  ${resp.content}
   VD Should Be In VD List  ${jsondata}  ${vd_id}  @{args}
 
-TC-5 Delete VD [Arguments]  ${CONTROLLER_ID}  ${vd_id}
+Delete VD  [Arguments]  ${CONTROLLER_ID}  ${vd_id}
     ${resp}=  Send http DELETE request with URL  /v0.5/controllers/${CONTROLLER_ID}/virtualdevices/${vd_id}
-    Should Be Equal As Strings  ${resp.status_code}   204
+  #  Should Be Equal As Strings  ${resp.status_code}   204
