@@ -112,5 +112,12 @@ class CommonKeywords(object):
             a.append(i)
         return a
 
+    def change_drives_from_bad_state_to_good(self, controller_id):
+        #TODO
+        pass
+
+    def delete_existed_vds(self, controller_id):
+        #TODO
+        pass
 
 

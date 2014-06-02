@@ -6,8 +6,10 @@ Suite Teardown  Close All Connections
 Resource  config.txt
 ***Test Cases***
 
-#Preconditions
-#	${CONTROLLER_ID}=  Get controller id
+Preconditions
+	${CONTROLLER_ID}=  Get controller id
+	Set Global Variable  CONTROLLER_ID  ${CONTROLLER_ID}
+	Change Drives From Bad State To Good  ${CONTROLLER_ID}
 
 #TC
 #	Should Match Regexp  ${JSON_EENUMERATE_CONTROLLERS_EXAMPLE}  ${JSON_EENUMERATE_CONTROLLERS_TEMPLATE}
